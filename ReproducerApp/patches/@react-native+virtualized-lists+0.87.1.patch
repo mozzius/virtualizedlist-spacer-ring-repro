@@ -1,20 +1,3 @@
-diff --git a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts
-index 31a95a3..2839d97 100644
---- a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts
-+++ b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts
-@@ -276,6 +276,12 @@ export interface VirtualizedListWithoutRenderItemProps<ItemT>
-    */
-   maxToRenderPerBatch?: number | undefined;
- 
-+  /**
-+   * REPRO ONLY: size a spacer that has rendered cells on both sides of it from
-+   * where those cells were laid out, instead of from `_averageCellLength`.
-+   */
-+  measureInteriorSpacers?: boolean | undefined;
-+
-   /**
-    * Called once when the scroll position gets within within `onEndReachedThreshold`
-    * from the logical end of the list.
 diff --git a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
 index 298331a..ee563b7 100644
 --- a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js

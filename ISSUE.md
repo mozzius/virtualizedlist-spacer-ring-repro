@@ -2,16 +2,16 @@
 
 <!--
 Draft for react/react-native (the repo formerly at facebook/react-native), bug report template.
-Template fields are the "###" headings below. Attach the three videos from evidence/ when filing.
+Template fields are the "###" headings below. Attach evidence/ios-demo.mp4 and evidence/android-demo.mp4 when filing.
 -->
 
 ### Description
 
-After a large prepend to a `FlatList` with `maintainVisibleContentPosition`, the list and the mVCP anchor can fall into a cycle that never settles. Every ~67 ms `contentSize.height` and `contentOffset.y` jump together by ~426 pt, then jump back. It keeps going at rest, for as long as you leave it.
+After a large prepend to a `FlatList` with `maintainVisibleContentPosition`, the list and the mVCP anchor can fall into a cycle that never settles. Every ~67 ms `contentSize.height` and `contentOffset.y` jump together by roughly 400 pt, then jump back. It keeps going at rest, for as long as you leave it.
 
 The visible rows don't move, because mVCP compensates exactly. What does move:
 
-- every `onScroll` listener sees a stream of ±426 pt scroll events, with ~15 direction reversals per second. Anything driven by scroll position (a collapsing header, scroll-linked animations) flickers.
+- every `onScroll` listener sees a stream of ±400 pt scroll events, with ~15 direction reversals per second. Anything driven by scroll position (a collapsing header, scroll-linked animations) flickers.
 - the scroll indicator jitters whenever it's visible.
 - the list re-renders and re-lays out ~15 times a second, indefinitely.
 
@@ -36,7 +36,7 @@ It needs:
 
 4. **mVCP shifts the offset by -426.3 pt.** From the new offset, `computeWindowedRenderLimits` puts `W-1` back in the window, so it mounts. The spacer flips back, the content grows by 426.3 pt, mVCP shifts +426.3 pt, and `W-1` drops out of the window again. That 2-cycle repeats indefinitely.
 
-Instrumented, at rest. The interior spacer alternates between these two states every ~67 ms (abbreviated; full output in [`evidence/ios-spacer-diagnostics.log`](https://github.com/mozzius/virtualizedlist-spacer-ring-repro/blob/main/evidence/ios-spacer-diagnostics.log)):
+Instrumented, at rest. The interior spacer alternates between these two states every ~67 ms. This run used an earlier version of the repro with a taller list, which is why it swings by 426 pt rather than the 397 pt in the logs below (abbreviated; full output in [`evidence/ios-spacer-diagnostics.log`](https://github.com/mozzius/virtualizedlist-spacer-ring-repro/blob/main/evidence/ios-spacer-diagnostics.log)):
 
 ```text
 [spacer] [10,37] size=9409.5 first(approx)={off:3531.48,i:10,m:false} last(approx)={i:37,len:301,m:true,off:12640} avg=353.15 above={i:9,len:89,off:3016} below={i:38,len:433,off:12941} window=[38,80]
@@ -79,14 +79,15 @@ The trade-off: unmeasured content above the viewport keeps its first estimated s
 
 The repro applies exactly this as a `patch-package` patch. Its only extra is a `measureInteriorSpacers` prop, which exists so stock and fixed can be compared in one app. With the patch, after "Run":
 
-- **iOS:** 2-4 corrections in total, then nothing in 5/5 runs. Stock rang until reset in 6/6 runs, ~14 ring steps/s.
-- **Android:** 2 corrections. Stock rang the same way, as a 3-cycle of -472 / -472 / +945 pt.
+- **iOS:** 2-4 corrections in total, then nothing, in 4/4 runs. Stock rang at rest until reset in 4/4 runs, ~15 ring steps/s.
+- **Android:** 4 corrections, then nothing, in 1/1 run. Stock rang at rest until reset in 4/5 runs; the exception was the first run after a cold launch.
+- **Earlier version of the repro:** stock 6/6 and fixed 5/5 on iOS.
 
 An alternative is to make `getCellMetricsApprox` estimate an unmeasured cell from the nearest measured cell *before* it, as it already does for cells past the highest measured index. That would also fix this case, but it needs a scan by index, since frames are keyed by item key.
 
 #### Upstream status
 
-The spacer sizing and `getCellMetricsApprox` are unchanged on `main` (4d590e6). I also ran `main`'s `packages/virtualized-lists/Lists` sources on top of 0.87.1, and it rings the same way: ±426.3 pt, ~15 reversals/s. This is separate from #53542 / #57955 (`pendingScrollUpdateCount`), which only matters around the prepend itself.
+The spacer sizing and `getCellMetricsApprox` are unchanged on `main` (4d590e6). I also ran `main`'s `packages/virtualized-lists/Lists` sources on top of 0.87.1, and it rings the same way: ±426.3 pt with the earlier, taller list, at ~15 reversals/s. This is separate from #53542 / #57955 (`pendingScrollUpdateCount`), which only matters around the prepend itself.
 
 Related, but not duplicates (these are native mVCP issues): #58186, #58578, #56866, #41212. Also related: #39187 (closed), where variable-height rows jump when scrolling up.
 
@@ -96,7 +97,7 @@ When a cell outside the viewport mounts or unmounts, the content above the ancho
 
 #### Actual
 
-`contentOffset.y` and `contentSize.height` oscillate together, by the head block's estimate error (~426 pt here), every ~67 ms, indefinitely. `onScroll` keeps firing at rest.
+`contentOffset.y` and `contentSize.height` oscillate together, by the head block's estimate error (~400 pt here), every ~67 ms, indefinitely. `onScroll` keeps firing at rest.
 
 ### Steps to reproduce
 
@@ -104,7 +105,7 @@ When a cell outside the viewport mounts or unmounts, the content above the ancho
 2. `yarn install`. The `postinstall` step applies the patch, which only adds an opt-in prop used by the **Fix** switch. With the switch off, VirtualizedList runs unmodified code.
 3. `cd ios && bundle install && bundle exec pod install && cd ..`
 4. `yarn start`, then `yarn ios` (or `yarn android`).
-5. Tap **Run**. It scrolls down to y=3000, prepends 50 rows, then scrolls up 450 pt once the prepend has landed.
+5. Tap **Run**. It scrolls down to y=3000 and prepends 50 rows. Once the prepend has landed, it nudges the list up 50 pt every 500 ms, like a slow scroll back into the new rows. It stops as soon as the list keeps moving by itself, or after 12 nudges. The position where it rings depends on screen size, so Run searches for it rather than hardcoding it.
 6. Don't touch anything. Watch the readout at the top: `reversals in last 1s` stays at ~15 and the `ring` counter keeps climbing. Logs are in the JS console, prefixed `[ring]`.
 7. Turn on **Fix** (this resets the list) and tap **Run** again. You get 2-4 corrections, then everything is still.
 
@@ -212,31 +213,32 @@ Tested on: iOS Simulator (iPhone 17 Pro, iOS 26.5) and Android Emulator (Pixel 9
 
 ### Stacktrace or Logs
 
-The repro's `onScroll` log, stock, at rest after "Run". A `correction` is an event whose offset moved by the same amount as `contentSize`. A `RING` step is a correction that undid the previous one.
+The repro's `onScroll` log, stock, after "Run" on the iPhone 17 Pro simulator. A `correction` is an event whose offset moved by the same amount as `contentSize`. A `RING` step is a correction that undid the previous one.
 
 ```text
-[ring] +2005ms prepending 50 rows (-50..-1) at y=3000.0 h=8330.0
-[ring] +2053ms y=20252.0 (dy=+17252.0) h=28216.0 (dh=+19886.0)
+[ring] +2007ms prepending 50 rows (-50..-1) at y=3000.0 h=7245.0
+[ring] +2052ms y=20041.7 (dy=+17041.7) h=27082.7 (dh=+19837.7)
 ...
-[ring] +3555ms scrolling up 450pt
-...
-[ring] +3917ms y=20191.0 (dy=+426.3) h=28605.0 (dh=+426.3) correction #7 RING #4 (69ms after -426.3)
-[ring] +3982ms y=19764.7 (dy=-426.3) h=28178.7 (dh=-426.3) correction #8 RING #5 (65ms after +426.3)
-[ring] +4049ms y=20191.0 (dy=+426.3) h=28605.0 (dh=+426.3) correction #9 RING #6 (67ms after -426.3)
-[ring] +4116ms y=19764.7 (dy=-426.3) h=28178.7 (dh=-426.3) correction #10 RING #7 (67ms after +426.3)
-... (unchanged for 40 s, until the list was reset)
-[ring] +39904ms y=20191.0 (dy=+426.3) h=28605.0 (dh=+426.3) correction #545 RING #542 (68ms after -426.3)
-[ring] +39971ms y=19764.7 (dy=-426.3) h=28178.7 (dh=-426.3) correction #546 RING #543 (67ms after +426.3)
+[ring] +8210ms y=19642.3 (dy=-50.0) h=27183.3 (dh=+0.0)
+[ring] +8369ms y=19245.3 (dy=-397.0) h=26786.3 (dh=-397.0) correction #6
+[ring] +8433ms y=19642.3 (dy=+397.0) h=27183.3 (dh=+397.0) correction #7 RING #4 (64ms after -397.0)
+[ring] +8503ms y=19245.3 (dy=-397.0) h=26786.3 (dh=-397.0) correction #8 RING #5 (70ms after +397.0)
+[ring] +8572ms y=19642.3 (dy=+397.0) h=27183.3 (dh=+397.0) correction #9 RING #6 (69ms after -397.0)
+[ring] +8634ms y=19245.3 (dy=-397.0) h=26786.3 (dh=-397.0) correction #10 RING #7 (62ms after +397.0)
+[ring] +8723ms moving by itself, stopped scrolling
+... (unchanged for a minute, until the list was reset)
+[ring] +64972ms y=19642.3 (dy=+397.0) h=27183.3 (dh=+397.0) correction #853 RING #850 (74ms after -397.0)
+[ring] +65039ms y=19245.3 (dy=-397.0) h=26786.3 (dh=-397.0) correction #854 RING #851 (67ms after +397.0)
 ```
 
-With the fix, the same steps produce four corrections, and nothing after +3860 ms:
+With the fix, the same steps produce four corrections. Run nudges up all 12 times, and nothing moves after +9383 ms:
 
 ```text
-[ring] +2126ms y=20310.3 (dy=+58.3) h=28274.3 (dh=+58.3) correction #1
-[ring] +2187ms y=20624.7 (dy=+314.3) h=28588.7 (dh=+314.3) correction #2
-[ring] +3787ms y=19831.3 (dy=-426.3) h=28162.3 (dh=-426.3) correction #3
-[ring] +3856ms y=20195.0 (dy=+442.7) h=28605.0 (dh=+442.7) correction #4 RING #1 (69ms after -426.3)
-[ring] +3860ms y=20191.0 (dy=-4.0) h=28605.0 (dh=+0.0)
+[ring] +2152ms y=20176.7 (dy=+135.0) h=27217.7 (dh=+135.0) correction #1
+[ring] +8296ms y=20088.0 (dy=+411.3) h=27629.0 (dh=+411.3) correction #2
+[ring] +9317ms y=19581.3 (dy=-406.7) h=27222.3 (dh=-406.7) correction #3
+[ring] +9383ms y=19987.3 (dy=+406.0) h=27628.3 (dh=+406.0) correction #4 RING #1 (66ms after -406.7)
+[ring] +9749ms still after 12 nudges, stopped scrolling
 ```
 
 The full logs are in the repro's [`evidence/`](https://github.com/mozzius/virtualizedlist-spacer-ring-repro/tree/main/evidence) directory, along with Android logs and a run that scrolls up through the prepended rows.
@@ -249,6 +251,7 @@ https://github.com/mozzius/virtualizedlist-spacer-ring-repro
 
 <!-- Drag these into the issue when filing; GitHub hosts the uploads. -->
 
-- `evidence/ios-stock.mp4`: stock, one tap on Run, then hands off. The rows stay still, while the readout's offset and size flip ~15 times a second and its counters climb.
-- `evidence/ios-fixed.mp4`: the same steps with **Fix** on. It settles immediately.
-- `evidence/ios-stock-drag.mp4`: stock, holding a slow drag while it rings. The scroll indicator jitters under the finger.
+Each video is one take: stock first, then the same steps with **Fix** on.
+
+- `evidence/ios-demo.mp4` (iOS simulator, 40 s). Stock: tap Run and the list rings at rest. The rows stay still while the readout turns red, the offset and size flip ~15 times a second, and the counters climb. During a slow drag the scroll indicator jitters, and it keeps ringing after release. Fixed: four corrections, then still. The same drag is smooth.
+- `evidence/android-demo.mp4` (Android emulator, 39 s). The same steps. Stock rings straight after the prepend, and the scroll bar jitters. Fixed: four corrections, then still.

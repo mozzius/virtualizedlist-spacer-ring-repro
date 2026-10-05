@@ -33,12 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 }
 
-/* Metro runs on 8090 here, because 8081 is taken on the machine this was
- * built on. React-Core ships as a prebuilt xcframework, so RCT_METRO_PORT is
- * baked in at compile time and `--port` cannot change it; the packager
- * location is set at runtime instead. */
-private let METRO_PORT = 8090
-
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     self.bundleURL()
@@ -46,10 +40,9 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 
   override func bundleURL() -> URL? {
 #if DEBUG
-    RCTBundleURLProvider.sharedSettings().jsLocation = "localhost:\(METRO_PORT)"
-    return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
 #else
-    return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
   }
 }

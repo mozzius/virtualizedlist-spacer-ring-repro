@@ -12,6 +12,7 @@ import {
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
   Pressable,
   StatusBar,
   StyleSheet,
@@ -25,8 +26,14 @@ const INITIAL_ROWS = 200;
 const PREPEND_ROWS = 50;
 /** How far down to scroll before prepending, in points. */
 const SCROLL_BEFORE_PREPEND = 3000;
-/** How far back up to scroll after prepending, in points. */
-const SCROLL_AFTER_PREPEND = 450;
+/*
+ * After the prepend, Run scrolls back up in small steps, like a slow scroll,
+ * and stops as soon as the list keeps moving by itself. Where that happens
+ * depends on the screen size, so it is found rather than hardcoded.
+ */
+const NUDGE = 50;
+const MAX_NUDGES = 12;
+const NUDGE_INTERVAL = 500;
 
 type Row = { id: number; height: number };
 
@@ -67,6 +74,7 @@ const stats = {
   /** Corrections that undid the previous one within 300 ms. */
   ring: 0,
   lastCorrection: null as null | { dh: number; t: number },
+  lastRingAt: null as null | number,
   maxSwing: 0,
 };
 
@@ -83,6 +91,7 @@ function resetStats() {
   stats.corrections = 0;
   stats.ring = 0;
   stats.lastCorrection = null;
+  stats.lastRingAt = null;
   stats.maxSwing = 0;
 }
 
@@ -125,6 +134,7 @@ function onScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const prev = stats.lastCorrection;
     if (prev && Math.sign(prev.dh) !== Math.sign(dh) && t - prev.t < 300) {
       stats.ring++;
+      stats.lastRingAt = t;
       stats.maxSwing = Math.max(stats.maxSwing, Math.abs(dh));
       tag += ` RING #${stats.ring} (${t - prev.t}ms after ${fmt(prev.dh)})`;
     }
@@ -147,14 +157,18 @@ function Readout({ fix }: { fix: boolean }) {
   }, []);
   const now = Date.now();
   const reversalsPerSecond = stats.reversals.filter(r => now - r < 1000).length;
+  /* Red while it is actually ringing, so a settled list reads as settled. */
+  const ringing = stats.lastRingAt != null && now - stats.lastRingAt < 1000;
   return (
     <View style={styles.readout}>
-      <Text style={styles.readoutText}>
+      <Text style={[styles.readoutText, styles.mode]}>
         {fix ? 'FIXED (measureInteriorSpacers)' : 'STOCK'}
       </Text>
       <Text style={styles.readoutText}>
-        contentOffset.y {stats.y.toFixed(1)} · contentSize.height{' '}
-        {stats.h.toFixed(1)}
+        contentOffset.y {stats.y.toFixed(1)}
+      </Text>
+      <Text style={styles.readoutText}>
+        contentSize.height {stats.h.toFixed(1)}
       </Text>
       <Text
         style={[
@@ -164,11 +178,11 @@ function Readout({ fix }: { fix: boolean }) {
       >
         reversals in last 1s: {reversalsPerSecond}
       </Text>
-      <Text
-        style={[styles.readoutText, stats.ring > 0 ? styles.bad : undefined]}
-      >
-        ring: {stats.ring} · corrections: {stats.corrections} · max swing{' '}
-        {stats.maxSwing.toFixed(0)}pt
+      <Text style={[styles.readoutText, ringing ? styles.bad : undefined]}>
+        ring: {stats.ring} · corrections: {stats.corrections}
+      </Text>
+      <Text style={[styles.readoutText, ringing ? styles.bad : undefined]}>
+        max swing: {stats.maxSwing.toFixed(0)}pt
       </Text>
     </View>
   );
@@ -244,9 +258,38 @@ function App() {
     });
   };
 
+  /** Whether the list moved by itself (reversed direction) recently. */
+  const isRinging = () =>
+    stats.reversals.filter(r => Date.now() - r < 400).length >= 4;
+
+  /** Scroll up NUDGE points at a time until the list rings by itself. */
+  const nudgeUp = (step: number) => {
+    if (isRinging()) {
+      console.log(
+        `[ring] +${
+          Date.now() - stats.t0
+        }ms moving by itself, stopped scrolling`,
+      );
+      return;
+    }
+    if (step === MAX_NUDGES) {
+      console.log(
+        `[ring] +${
+          Date.now() - stats.t0
+        }ms still after ${step} nudges, stopped scrolling`,
+      );
+      return;
+    }
+    listRef.current?.scrollToOffset({
+      offset: stats.y - NUDGE,
+      animated: false,
+    });
+    timers.current.push(setTimeout(() => nudgeUp(step + 1), NUDGE_INTERVAL));
+  };
+
   /**
    * Reset, scroll a few screens down, prepend, then once the prepend has
-   * landed scroll up a little, into the prepended rows.
+   * landed scroll back up into the prepended rows a little at a time.
    */
   const run = () => {
     reset();
@@ -259,18 +302,7 @@ function App() {
       }, 1000),
       setTimeout(() => {
         onPrependLanded = () => {
-          timers.current.push(
-            setTimeout(() => {
-              console.log(
-                `[ring] +${Date.now() - stats.t0}ms scrolling up ` +
-                  `${SCROLL_AFTER_PREPEND}pt`,
-              );
-              listRef.current?.scrollToOffset({
-                offset: stats.y - SCROLL_AFTER_PREPEND,
-                animated: true,
-              });
-            }, 1500),
-          );
+          timers.current.push(setTimeout(() => nudgeUp(0), 1500));
         };
         prepend();
       }, 2000),
@@ -345,7 +377,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: '#999',
   },
-  readoutText: { fontFamily: 'Menlo', fontSize: 12 },
+  readoutText: {
+    fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  mode: { fontWeight: '700' },
   bad: { color: '#dc2626', fontWeight: '700' },
   list: { flex: 1 },
   row: {

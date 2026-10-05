@@ -1,0 +1,108 @@
+diff --git a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts
+index 31a95a3..2839d97 100644
+--- a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts
++++ b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.d.ts
+@@ -276,6 +276,12 @@ export interface VirtualizedListWithoutRenderItemProps<ItemT>
+    */
+   maxToRenderPerBatch?: number | undefined;
+ 
++  /**
++   * REPRO ONLY: size a spacer that has rendered cells on both sides of it from
++   * where those cells were laid out, instead of from `_averageCellLength`.
++   */
++  measureInteriorSpacers?: boolean | undefined;
++
+   /**
+    * Called once when the scroll position gets within within `onEndReachedThreshold`
+    * from the logical end of the list.
+diff --git a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
+index 298331a..ee563b7 100644
+--- a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
++++ b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
+@@ -887,6 +887,62 @@ class VirtualizedList extends StateSafePureComponent<
+   _getSpacerKey = (isVertical: boolean): string =>
+     isVertical ? 'height' : 'width';
+ 
++  /**
++   * The size of a spacer that has rendered cells on both sides of it, taken
++   * from where those two cells were laid out, or null to fall back to the
++   * estimate.
++   *
++   * The estimate (`getCellMetricsApprox(last) - getCellMetricsApprox(first)`)
++   * mixes a measured frame with `_averageCellLength * index` whenever only one
++   * end of the region has a frame. The cells retained for scroll-to-top leave
++   * such an interior spacer directly above the viewport after a large prepend,
++   * and its size then jumps every time a cell mounts or unmounts at the
++   * window's leading edge, which `maintainVisibleContentPosition` has to
++   * correct for. Measuring the gap between the bracketing cells leaves no
++   * estimate in it, and is self-consistent: it is the size that produced
++   * those two layouts.
++   *
++   * REPRO ONLY: gated behind `measureInteriorSpacers` so the stock and fixed
++   * behaviour can be compared in one app. The proposed upstream fix is
++   * unconditional.
++   */
++  _measuredInteriorSpacerSize(region: {
++    first: number,
++    last: number,
++    ...
++  }): ?number {
++    if (
++      this.props.measureInteriorSpacers !== true ||
++      this.props.getItemLayout != null ||
++      region.first === 0 ||
++      region.last + 1 >= this.props.getItemCount(this.props.data)
++    ) {
++      return null;
++    }
++    const above = this._listMetrics.getCellMetrics(
++      region.first - 1,
++      this.props,
++    );
++    const below = this._listMetrics.getCellMetrics(
++      region.last + 1,
++      this.props,
++    );
++    // Both cells must be laid out where they are mounted now: a frame left
++    // behind by an unmounted cell describes a layout the list has moved on from.
++    if (
++      above == null ||
++      below == null ||
++      !above.isMounted ||
++      !below.isMounted
++    ) {
++      return null;
++    }
++    const size = below.offset - (above.offset + above.length);
++    // The region holds at least one cell, so no gap means the two frames were
++    // measured either side of a change and can't be compared.
++    return size > 0 ? size : null;
++  }
++
+   static _keyExtractor(
+     item: Item,
+     index: number,
+@@ -1043,6 +1099,7 @@ class VirtualizedList extends StateSafePureComponent<
+             this.props,
+           );
+           const spacerSize =
++            this._measuredInteriorSpacerSize(section) ??
+             lastMetrics.offset + lastMetrics.length - firstMetrics.offset;
+           cells.push(
+             <View
+diff --git a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedListProps.js b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedListProps.js
+index f567595..3089fef 100644
+--- a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedListProps.js
++++ b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedListProps.js
+@@ -186,6 +186,11 @@ type OptionalVirtualizedListProps = {
+    * interfere with responding to button taps or other interactions.
+    */
+   maxToRenderPerBatch?: ?number,
++  /**
++   * REPRO ONLY: size a spacer that has rendered cells on both sides of it from
++   * where those cells were laid out, instead of from `_averageCellLength`.
++   */
++  measureInteriorSpacers?: ?boolean,
+   /**
+    * Called once when the scroll position gets within within `onEndReachedThreshold`
+    * from the logical end of the list.

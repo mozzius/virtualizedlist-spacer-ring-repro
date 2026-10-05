@@ -1,0 +1,26 @@
+# Temporary instrumentation (not in the repo): a console.log after `spacerSize` is computed
+# in VirtualizedList's render, for the interior spacer only. `first`/`last` are the
+# getCellMetricsApprox() results the stock code uses; `above`/`below` are the frames of the
+# rendered cells either side of the spacer (indices 9 and 37/38). avg = _averageCellLength.
+# The head block [0, 9] really ends at 3016 + 89 = 3105, but first(approx) puts index 10 at
+# avg * 10 = 3531.5. When last(approx) is a measured frame (index 37 just unmounted), the
+# spacer is a measured end minus an estimated start: [10,37] = 9409.5, whereas with index 37
+# mounted the same region is 9535 (spacer [10,36], all estimate) + 301 (index 37) = 9836.
+# The difference, 426.5 pt, is exactly 3531.5 - 3105: the error in the estimated start.
+#
+# STOCK, at rest, alternating every ~67 ms:
+[spacer] [10,37] size=9409.5 first(approx)={len:353.14816510235823,off:3531.4816510235823,i:10,m:false} last(approx)={i:37,len:301,m:true,off:12640} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:38,len:433,m:true,off:12941} window=[38,80]
+[spacer] [10,36] size=9535.0 first(approx)={len:353.1481470178675,off:3531.4814701786745,i:10,m:false} last(approx)={len:353.1481470178675,off:12713.333292643229,i:36,m:false} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:37,len:301,m:false,off:12640} window=[37,79]
+[spacer] [10,37] size=9409.5 first(approx)={len:353.14816510235823,off:3531.4816510235823,i:10,m:false} last(approx)={i:37,len:301,m:true,off:12640} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:38,len:433,m:true,off:12941} window=[38,80]
+[spacer] [10,36] size=9535.0 first(approx)={len:353.1481470178675,off:3531.4814701786745,i:10,m:false} last(approx)={len:353.1481470178675,off:12713.333292643229,i:36,m:false} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:37,len:301,m:false,off:12640} window=[37,79]
+[spacer] [10,37] size=9409.5 first(approx)={len:353.14816510235823,off:3531.4816510235823,i:10,m:false} last(approx)={i:37,len:301,m:true,off:12640} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:38,len:433,m:true,off:12941} window=[38,80]
+[spacer] [10,36] size=9535.0 first(approx)={len:353.1481470178675,off:3531.4814701786745,i:10,m:false} last(approx)={len:353.1481470178675,off:12713.333292643229,i:36,m:false} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:37,len:301,m:false,off:12640} window=[37,79]
+
+# FIXED: the first render after index 37 unmounts still falls back to the estimate (index 38's
+# frame is from before the change, isMounted false), which is the one correction pair in
+# ios-fixed.log. Once indices 9 and 38 are both laid out, spacer [10,37] is measured as
+# below.offset - (above.offset + above.length) = 12941 - (3016 + 89) = 9836,
+# which is exactly the size that the [10,36] spacer + row 37 occupied (9535 + 301).
+[spacer] [10,37] size=9393.2 first(approx)={len:353.1481470178675,off:3531.4814701786745,i:10,m:false} last(approx)={i:37,len:301,m:false,off:12623.6669921875} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:38,len:433,m:false,off:12924.6669921875} window=[38,79]
+[spacer] [10,36] size=9535.0 first(approx)={len:353.1481289333767,off:3531.481289333767,i:10,m:false} last(approx)={len:353.1481289333767,off:12713.332641601562,i:36,m:false} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:37,len:301,m:false,off:12623.6669921875} window=[37,79]
+[spacer] [10,37] size=9836.0 first(approx)={len:353.14816510235823,off:3531.4816510235823,i:10,m:false} last(approx)={i:37,len:301,m:true,off:12640} avg=353.15 above={i:9,len:89,m:true,off:3016} below={i:38,len:433,m:true,off:12941} window=[38,79]

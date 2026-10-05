@@ -1,0 +1,73 @@
+# iOS simulator, scrolling up through the prepended rows: scroll to y=3000, prepend 50 rows
+# (an earlier version of "Run", before it scrolled up by itself), then eight half-screen
+# drags up, 1 s apart, then rest. Only the prepend and the mVCP corrections are shown.
+
+## STOCK: 423 corrections, 285 ring steps, still ringing at rest when reset
+
+[ring] reset, STOCK
+[ring] +2007ms prepending 50 rows (-50..-1) at y=3000.0 h=8330.0
+[ring] +2078ms y=19831.0 (dy=-421.0) h=27795.0 (dh=-421.0) correction #1
+[ring] +2145ms y=20310.3 (dy=+479.3) h=28274.3 (dh=+479.3) correction #2 RING #1 (67ms after -421.0)
+[ring] +2205ms y=20624.7 (dy=+314.3) h=28588.7 (dh=+314.3) correction #3
+[ring] +2268ms y=20198.3 (dy=-426.3) h=28162.3 (dh=-426.3) correction #4 RING #2 (63ms after +314.3)
+[ring] +3757ms y=20302.7 (dy=+442.7) h=28605.0 (dh=+442.7) correction #5
+[ring] +3821ms y=19842.3 (dy=-426.3) h=28178.7 (dh=-426.3) correction #6 RING #3 (64ms after +442.7)
+[ring] +3886ms y=20256.3 (dy=+426.3) h=28605.0 (dh=+426.3) correction #7 RING #4 (65ms after -426.3)
+[ring] +3952ms y=19828.0 (dy=-426.3) h=28178.7 (dh=-426.3) correction #8 RING #5 (66ms after +426.3)
+[ring] +4021ms y=20254.3 (dy=+426.3) h=28605.0 (dh=+426.3) correction #9 RING #6 (69ms after -426.3)
+[ring] +4089ms y=19828.0 (dy=-426.3) h=28178.7 (dh=-426.3) correction #10 RING #7 (68ms after +426.3)
+[ring] +4156ms y=20254.3 (dy=+426.3) h=28605.0 (dh=+426.3) correction #11 RING #8 (67ms after -426.3)
+[ring] +4218ms y=19828.0 (dy=-426.3) h=28178.7 (dh=-426.3) correction #12 RING #9 (62ms after +426.3)
+[ring] +4283ms y=20254.3 (dy=+426.3) h=28605.0 (dh=+426.3) correction #13 RING #10 (65ms after -426.3)
+[ring] +4350ms y=19828.0 (dy=-426.3) h=28178.7 (dh=-426.3) correction #14 RING #11 (67ms after +426.3)
+[ring] +4420ms y=20254.3 (dy=+426.3) h=28605.0 (dh=+426.3) correction #15 RING #12 (70ms after -426.3)
+[ring] +4488ms y=19828.0 (dy=-426.3) h=28178.7 (dh=-426.3) correction #16 RING #13 (68ms after +426.3)
+[ring] +4551ms y=20254.3 (dy=+426.3) h=28605.0 (dh=+426.3) correction #17 RING #14 (63ms after -426.3)
+[ring] +4621ms y=19700.3 (dy=-426.3) h=28178.7 (dh=-426.3) correction #18 RING #15 (70ms after +426.3)
+[ring] +4686ms y=20304.0 (dy=+725.0) h=28903.7 (dh=+725.0) correction #19 RING #16 (65ms after -426.3)
+[ring] +4750ms y=19748.3 (dy=-479.7) h=28424.0 (dh=-479.7) correction #20 RING #17 (64ms after +725.0)
+[ring] +4883ms y=19213.0 (dy=-479.7) h=27944.3 (dh=-479.7) correction #21
+[ring] +5838ms y=19882.3 (dy=+987.7) h=28932.0 (dh=+987.7) correction #22
+[ring] +5907ms y=19398.7 (dy=-461.7) h=28470.3 (dh=-461.7) correction #23 RING #18 (69ms after +987.7)
+[ring] +6032ms y=18931.0 (dy=-461.7) h=27962.3 (dh=-461.7) correction #24
+[ring] +6105ms y=19392.7 (dy=+461.7) h=28424.0 (dh=+461.7) correction #25 RING #19 (73ms after -461.7)
+[ring] +6166ms y=18931.0 (dy=-461.7) h=27962.3 (dh=-461.7) correction #26 RING #20 (61ms after +461.7)
+[ring] +6236ms y=19392.7 (dy=+461.7) h=28424.0 (dh=+461.7) correction #27 RING #21 (70ms after -461.7)
+[ring] +6306ms y=18931.0 (dy=-461.7) h=27962.3 (dh=-461.7) correction #28 RING #22 (70ms after +461.7)
+[ring] +6374ms y=19392.7 (dy=+461.7) h=28424.0 (dh=+461.7) correction #29 RING #23 (68ms after -461.7)
+[ring] +6434ms y=18931.0 (dy=-461.7) h=27962.3 (dh=-461.7) correction #30 RING #24 (60ms after +461.7)
+[ring] +6502ms y=19392.7 (dy=+461.7) h=28424.0 (dh=+461.7) correction #31 RING #25 (68ms after -461.7)
+[ring] +6569ms y=18931.0 (dy=-461.7) h=27962.3 (dh=-461.7) correction #32 RING #26 (67ms after +461.7)
+[ring] +6635ms y=19392.7 (dy=+461.7) h=28424.0 (dh=+461.7) correction #33 RING #27 (66ms after -461.7)
+[ring] +6704ms y=18768.3 (dy=-461.7) h=27962.3 (dh=-461.7) correction #34 RING #28 (69ms after +461.7)
+[ring] +6770ms y=19540.7 (dy=+881.7) h=28844.0 (dh=+881.7) correction #35 RING #29 (66ms after -461.7)
+[ring] +6835ms y=19012.7 (dy=-461.7) h=28382.3 (dh=-461.7) correction #36 RING #30 (65ms after +881.7)
+[ring] +7802ms y=19133.7 (dy=+461.7) h=28885.7 (dh=+461.7) correction #37
+[ring] +8865ms y=18760.7 (dy=+461.7) h=28424.0 (dh=+461.7) correction #38
+[ring] +10836ms y=17894.0 (dy=-241.3) h=28182.7 (dh=-241.3) correction #39
+[ring] +10903ms y=17435.7 (dy=-372.0) h=27810.7 (dh=-372.0) correction #40
+[ring] +10966ms y=17012.3 (dy=-374.3) h=27436.3 (dh=-374.3) correction #41
+[ring] +11037ms y=17313.0 (dy=+319.0) h=27755.3 (dh=+319.0) correction #42 RING #31 (71ms after -374.3)
+[ring] +11101ms y=16923.7 (dy=-380.7) h=27374.7 (dh=-380.7) correction #43 RING #32 (64ms after +319.0)
+... (370 lines omitted) ...
+[ring] +44595ms y=17314.7 (dy=+761.3) h=27766.7 (dh=+761.3) correction #414 RING #279 (75ms after -380.7)
+[ring] +44652ms y=16934.0 (dy=-380.7) h=27386.0 (dh=-380.7) correction #415 RING #280 (57ms after +761.3)
+[ring] +44781ms y=16553.3 (dy=-380.7) h=27005.3 (dh=-380.7) correction #416
+[ring] +44858ms y=17314.7 (dy=+761.3) h=27766.7 (dh=+761.3) correction #417 RING #281 (77ms after -380.7)
+[ring] +44919ms y=16934.0 (dy=-380.7) h=27386.0 (dh=-380.7) correction #418 RING #282 (61ms after +761.3)
+[ring] +45055ms y=16553.3 (dy=-380.7) h=27005.3 (dh=-380.7) correction #419
+[ring] +45129ms y=17314.7 (dy=+761.3) h=27766.7 (dh=+761.3) correction #420 RING #283 (74ms after -380.7)
+[ring] +45183ms y=16934.0 (dy=-380.7) h=27386.0 (dh=-380.7) correction #421 RING #284 (54ms after +761.3)
+[ring] +45318ms y=16553.3 (dy=-380.7) h=27005.3 (dh=-380.7) correction #422
+[ring] +45389ms y=17314.7 (dy=+761.3) h=27766.7 (dh=+761.3) correction #423 RING #285 (71ms after -380.7)
+
+## FIXED: 6 corrections, 0 ring steps
+
+[ring] reset, FIXED
+[ring] +2014ms prepending 50 rows (-50..-1) at y=3000.0 h=8330.0
+[ring] +2152ms y=20310.3 (dy=+58.3) h=28274.3 (dh=+58.3) correction #1
+[ring] +2211ms y=20624.7 (dy=+314.3) h=28588.7 (dh=+314.3) correction #2
+[ring] +3763ms y=19849.0 (dy=-426.3) h=28162.3 (dh=-426.3) correction #3
+[ring] +5767ms y=19856.7 (dy=+298.7) h=28887.3 (dh=+298.7) correction #4
+[ring] +7969ms y=19040.7 (dy=-105.0) h=28483.7 (dh=-105.0) correction #5
+[ring] +8884ms y=18426.7 (dy=+178.7) h=28305.7 (dh=+178.7) correction #6

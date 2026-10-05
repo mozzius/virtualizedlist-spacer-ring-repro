@@ -1,0 +1,119 @@
+# Android emulator (Pixel 9 Pro AVD, Android 15 / API 35). Steps: scroll to y=3000, prepend 50
+# rows, then one manual half-screen drag up (an earlier version of "Run", before it scrolled up
+# by itself). On Android the STOCK list started ringing right after the prepend, before the drag.
+# Logging stopped ~7.7 s into the STOCK run while the list was still ringing (the app
+# then showed an ANR dialog, not investigated).
+
+## STOCK
+
+[ring] reset, STOCK
+[ring] +1034ms y=3000.0 (dy=+3000.0) h=9524.0 (dh=+0.0)
+[ring] +2016ms prepending 50 rows (-50..-1) at y=3000.0 h=9524.0
+[ring] +2102ms y=20338.0 (dy=+17338.0) h=29436.0 (dh=+19912.0)
+[ring] +2118ms y=19926.0 (dy=-412.0) h=29024.0 (dh=-412.0) correction #1
+[ring] +2187ms y=20381.7 (dy=+455.7) h=29479.7 (dh=+455.7) correction #2 RING #1 (69ms after -412.0)
+[ring] +2268ms y=20729.0 (dy=+347.3) h=29827.0 (dh=+347.3) correction #3
+[ring] +2336ms y=20278.7 (dy=-450.3) h=29376.7 (dh=-450.3) correction #4 RING #2 (68ms after +347.3)
+[ring] +2471ms y=19828.3 (dy=-450.3) h=28926.3 (dh=-450.3) correction #5
+[ring] +2539ms y=20900.3 (dy=+1072.0) h=29998.3 (dh=+1072.0) correction #6 RING #3 (68ms after -450.3)
+[ring] +2602ms y=20428.0 (dy=-472.3) h=29526.0 (dh=-472.3) correction #7 RING #4 (63ms after +1072.0)
+[ring] +2738ms y=19955.7 (dy=-472.3) h=29053.7 (dh=-472.3) correction #8
+[ring] +2853ms y=20428.0 (dy=+472.3) h=29526.0 (dh=+472.3) correction #9 RING #5 (115ms after -472.3)
+[ring] +2906ms y=19955.7 (dy=-472.3) h=29053.7 (dh=-472.3) correction #10 RING #6 (53ms after +472.3)
+[ring] +3040ms y=20428.0 (dy=+472.3) h=29526.0 (dh=+472.3) correction #11 RING #7 (134ms after -472.3)
+[ring] +3119ms y=19955.7 (dy=-472.3) h=29053.7 (dh=-472.3) correction #12 RING #8 (79ms after +472.3)
+[ring] +3194ms y=20428.0 (dy=+472.3) h=29526.0 (dh=+472.3) correction #13 RING #9 (75ms after -472.3)
+[ring] +3252ms y=19955.7 (dy=-472.3) h=29053.7 (dh=-472.3) correction #14 RING #10 (58ms after +472.3)
+[ring] +3319ms y=20428.0 (dy=+472.3) h=29526.0 (dh=+472.3) correction #15 RING #11 (67ms after -472.3)
+[ring] +3386ms y=19955.7 (dy=-472.3) h=29053.7 (dh=-472.3) correction #16 RING #12 (67ms after +472.3)
+[ring] +3453ms y=20428.0 (dy=+472.3) h=29526.0 (dh=+472.3) correction #17 RING #13 (67ms after -472.3)
+[ring] +3543ms y=19955.7 (dy=-472.3) h=29053.7 (dh=-472.3) correction #18 RING #14 (90ms after +472.3)
+[ring] +3550ms y=19883.0 (dy=-72.7) h=29053.7 (dh=+0.0)
+[ring] +3568ms y=19837.7 (dy=-45.3) h=29053.7 (dh=+0.0)
+[ring] +3583ms y=19801.7 (dy=-36.0) h=29053.7 (dh=+0.0)
+[ring] +3604ms y=20240.3 (dy=+438.7) h=29526.0 (dh=+472.3)
+[ring] +3618ms y=20208.7 (dy=-31.7) h=29526.0 (dh=+0.0)
+[ring] +3635ms y=20180.3 (dy=-28.3) h=29526.0 (dh=+0.0)
+[ring] +3652ms y=20153.3 (dy=-27.0) h=29526.0 (dh=+0.0)
+[ring] +3669ms y=19657.3 (dy=-496.0) h=29053.7 (dh=-472.3)
+[ring] +3683ms y=19636.0 (dy=-21.3) h=29053.7 (dh=+0.0)
+[ring] +3700ms y=19617.7 (dy=-18.3) h=29053.7 (dh=+0.0)
+[ring] +3738ms y=20583.0 (dy=+965.3) h=30048.7 (dh=+995.0)
+[ring] +3750ms y=20571.3 (dy=-11.7) h=30048.7 (dh=+0.0)
+[ring] +3766ms y=20561.0 (dy=-10.3) h=30048.7 (dh=+0.0)
+[ring] +3783ms y=20553.3 (dy=-7.7) h=30048.7 (dh=+0.0)
+[ring] +3802ms y=20074.3 (dy=-479.0) h=29576.3 (dh=-472.3)
+[ring] +3817ms y=20068.7 (dy=-5.7) h=29576.3 (dh=+0.0)
+[ring] +3834ms y=20065.0 (dy=-3.7) h=29576.3 (dh=+0.0)
+[ring] +3850ms y=20062.3 (dy=-2.7) h=29576.3 (dh=+0.0)
+[ring] +3869ms y=20059.3 (dy=-3.0) h=29576.3 (dh=+0.0)
+[ring] +3883ms y=20058.3 (dy=-1.0) h=29576.3 (dh=+0.0)
+[ring] +3900ms y=20057.3 (dy=-1.0) h=29576.3 (dh=+0.0)
+[ring] +3936ms y=19584.7 (dy=-472.7) h=29104.0 (dh=-472.3) correction #19
+[ring] +4008ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #20 RING #15 (72ms after -472.3)
+[ring] +4068ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #21 RING #16 (60ms after +944.7)
+[ring] +4201ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #22
+[ring] +4269ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #23 RING #17 (68ms after -472.3)
+[ring] +4337ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #24 RING #18 (68ms after +944.7)
+[ring] +4468ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #25
+[ring] +4535ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #26 RING #19 (67ms after -472.3)
+[ring] +4601ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #27 RING #20 (66ms after +944.7)
+[ring] +4734ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #28
+[ring] +4804ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #29 RING #21 (70ms after -472.3)
+[ring] +4867ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #30 RING #22 (63ms after +944.7)
+[ring] +5002ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #31
+[ring] +5069ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #32 RING #23 (67ms after -472.3)
+[ring] +5134ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #33 RING #24 (65ms after +944.7)
+[ring] +5267ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #34
+[ring] +5337ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #35 RING #25 (70ms after -472.3)
+[ring] +5401ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #36 RING #26 (64ms after +944.7)
+[ring] +5535ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #37
+[ring] +5603ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #38 RING #27 (68ms after -472.3)
+[ring] +5669ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #39 RING #28 (66ms after +944.7)
+[ring] +5803ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #40
+[ring] +5869ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #41 RING #29 (66ms after -472.3)
+[ring] +5951ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #42 RING #30 (82ms after +944.7)
+[ring] +6084ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #43
+[ring] +6153ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #44 RING #31 (69ms after -472.3)
+[ring] +6218ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #45 RING #32 (65ms after +944.7)
+[ring] +6352ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #46
+[ring] +6419ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #47 RING #33 (67ms after -472.3)
+[ring] +6484ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #48 RING #34 (65ms after +944.7)
+[ring] +6618ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #49
+[ring] +6688ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #50 RING #35 (70ms after -472.3)
+[ring] +6751ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #51 RING #36 (63ms after +944.7)
+[ring] +6915ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #52
+[ring] +6953ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #53 RING #37 (38ms after -472.3)
+[ring] +7019ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #54 RING #38 (66ms after +944.7)
+[ring] +7151ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #55
+[ring] +7219ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #56 RING #39 (68ms after -472.3)
+[ring] +7286ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #57 RING #40 (67ms after +944.7)
+[ring] +7418ms y=19584.7 (dy=-472.3) h=29104.0 (dh=-472.3) correction #58
+[ring] +7486ms y=20529.3 (dy=+944.7) h=30048.7 (dh=+944.7) correction #59 RING #41 (68ms after -472.3)
+[ring] +7683ms y=20057.0 (dy=-472.3) h=29576.3 (dh=-472.3) correction #60 RING #42 (197ms after +944.7)
+
+## FIXED
+
+[ring] reset, FIXED
+[ring] +1033ms y=3000.0 (dy=+3000.0) h=9524.0 (dh=+0.0)
+[ring] +2125ms prepending 50 rows (-50..-1) at y=3000.0 h=9524.0
+[ring] +3255ms y=20338.0 (dy=+17338.0) h=29436.0 (dh=+19912.0)
+[ring] +3354ms y=20381.7 (dy=+43.7) h=29479.7 (dh=+43.7) correction #1
+[ring] +3433ms y=20729.0 (dy=+347.3) h=29827.0 (dh=+347.3) correction #2
+[ring] +3516ms y=20677.7 (dy=-51.3) h=29827.0 (dh=+0.0)
+[ring] +3534ms y=20632.3 (dy=-45.3) h=29827.0 (dh=+0.0)
+[ring] +3549ms y=20591.3 (dy=-41.0) h=29827.0 (dh=+0.0)
+[ring] +3565ms y=20556.3 (dy=-35.0) h=29827.0 (dh=+0.0)
+[ring] +3599ms y=20496.7 (dy=-59.7) h=29827.0 (dh=+0.0)
+[ring] +3615ms y=20468.7 (dy=-28.0) h=29827.0 (dh=+0.0)
+[ring] +3632ms y=20443.0 (dy=-25.7) h=29827.0 (dh=+0.0)
+[ring] +3649ms y=20420.7 (dy=-22.3) h=29827.0 (dh=+0.0)
+[ring] +3665ms y=20401.7 (dy=-19.0) h=29827.0 (dh=+0.0)
+[ring] +3682ms y=20384.7 (dy=-17.0) h=29827.0 (dh=+0.0)
+[ring] +3699ms y=20372.0 (dy=-12.7) h=29827.0 (dh=+0.0)
+[ring] +3714ms y=20357.0 (dy=-15.0) h=29827.0 (dh=+0.0)
+[ring] +3731ms y=20346.0 (dy=-11.0) h=29827.0 (dh=+0.0)
+[ring] +3749ms y=20338.3 (dy=-7.7) h=29827.0 (dh=+0.0)
+[ring] +3766ms y=20331.7 (dy=-6.7) h=29827.0 (dh=+0.0)
+[ring] +3785ms y=20325.3 (dy=-6.3) h=29827.0 (dh=+0.0)
+[ring] +14441ms y=20319.7 (dy=-5.7) h=29827.0 (dh=+0.0)

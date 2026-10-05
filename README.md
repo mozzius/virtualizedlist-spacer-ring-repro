@@ -1,79 +1,113 @@
-# virtualizedlist-spacer-ring-repro
+# VirtualizedList spacer ring under `maintainVisibleContentPosition`
 
-![Build](https://github.com/mozzius/virtualizedlist-spacer-ring-repro/workflows/Pre%20Merge%20Checks/badge.svg)
+After a large prepend to a `FlatList` with `maintainVisibleContentPosition`
+(mVCP), the list and the mVCP anchor can fall into a cycle that never settles.
+Every ~67 ms `contentSize.height` and `contentOffset.y` jump together by
+~426 pt, then jump back. The rows on screen don't move, because mVCP
+compensates exactly. But `onScroll` fires ~15 times a second with ±426 pt
+"movements", the scroll indicator jitters, and the list keeps re-rendering at
+rest for as long as you leave it.
 
-This is your new React Native Reproducer project.
+The cause is in `@react-native/virtualized-lists`. After the prepend, the
+interior spacer between the retained scroll-to-top cells and the render window
+is sized from a measured frame at one end and `_averageCellLength * index` at
+the other. Its size changes whenever a cell mounts or unmounts at the window's
+leading edge, and mVCP has to chase it. [`ISSUE.md`](ISSUE.md) has the full
+analysis and a proposed fix.
 
-# Reproducer TODO list
+- **Upstream issue:** not filed yet
+- **Found in:** the Bluesky app
+  ([bluesky-social/social-app#11872](https://github.com/bluesky-social/social-app/pull/11872)
+  carries the fix as a patch)
 
-- [x] 1. Create a new reproducer project.
-- [ ] 2. Git clone your repository locally.
-- [ ] 3. Edit the project to reproduce the failure you're seeing.
-- [ ] 4. Push your changes, so that Github Actions can run the CI.
-- [ ] 5. Make sure the repository is public and share the link with the issue you reported.
+## Environment
 
-# How to use this Reproducer
+| | |
+| --- | --- |
+| react-native | 0.87.1 (also 0.86.3; the code is unchanged on `main` at 4d590e6) |
+| react | 19.2.3 |
+| Architecture | New (Fabric), Hermes |
+| Reproduced on | iOS Simulator, iPhone 17 Pro, iOS 26.5 |
+| Also reproduced on | Android Emulator, Pixel 9 Pro, API 35 |
+| Dependencies | Only the template's, plus `patch-package` (see below) |
 
-This project has been created with `npx @react-native-community/cli init` and is a vanilla React Native app.
-
-> [!IMPORTANT]  
-> Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/set-up-your-environment) so that you have a working environment locally.
-
-## Step 1: Start the Metro Server
-
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
-
-To start Metro, run the following command from the _root_ of your React Native project:
+## Running it
 
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
+cd ReproducerApp
+yarn install            # postinstall applies patches/ with patch-package
+(cd ios && bundle install && bundle exec pod install)
 yarn start
+yarn ios                # or: yarn android
 ```
 
-## Step 2: Start your Application
+1. Tap **Run**. The app scrolls 3000 pt down, prepends 50 rows at the top,
+   and once the prepend has landed scrolls 450 pt back up into the new rows.
+2. Don't touch anything, and watch the readout at the top.
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+| | Stock | Fix on |
+| --- | --- | --- |
+| `reversals in last 1s` | ~15, indefinitely | 0 |
+| `ring` counter | climbs ~14/s until you reset | 0-1 |
+| `corrections` after Run | hundreds, still climbing | 2-4, then none |
+| Visible rows | still | still |
 
-### For Android
+Drag the list slowly while it's ringing to see the scroll indicator jitter
+under your finger. You can also scroll up through the prepended rows by hand:
+stock rings in bursts every time the window's leading edge passes a row.
 
-```bash
-# using npm
-npm run android
+### The readout and logs
 
-# OR using Yarn
-yarn android
+`onScroll` (`scrollEventThrottle={16}`) logs every event to the JS console
+(open React Native DevTools with `j` in Metro) with the prefix `[ring]`:
+
+```text
+[ring] +3917ms y=20191.0 (dy=+426.3) h=28605.0 (dh=+426.3) correction #7 RING #4 (69ms after -426.3)
+[ring] +3982ms y=19764.7 (dy=-426.3) h=28178.7 (dh=-426.3) correction #8 RING #5 (65ms after +426.3)
 ```
 
-### For iOS
+- **correction:** an event whose offset moved by the same amount as the
+  content height (`|dh| >= 20` and `|dy - dh| <= 2`). That is mVCP holding the
+  anchor, not the user scrolling.
+- **ring:** a correction that undid the previous one (opposite sign) within
+  300 ms.
+- **reversals in last 1s:** how many times `dy` changed sign in the last
+  second.
 
-First, make sure you install dependencies with:
+The rows have deterministic heights from 60 to 600 pt, from a hash of the row
+id, so every run lays out identically. Each row shows its id and height.
 
-```bash
-cd ios && bundle install && bundle exec pod install
-```
+## Toggling the fix
 
-Then you can run the iOS app with:
+The **Fix** switch passes `measureInteriorSpacers={true}` to the `FlatList`.
+Toggling it also resets the list. That prop doesn't exist upstream. It comes
+from [`patches/@react-native+virtualized-lists+0.87.1.patch`](ReproducerApp/patches/@react-native+virtualized-lists+0.87.1.patch),
+which `patch-package` applies on `yarn install`.
 
-```bash
-# using npm
-npm run ios
+- **Switch off:** `VirtualizedList` runs the stock code path, unchanged. The new
+  method returns `null` before reading anything, and the spacer uses the
+  upstream expression.
+- **Switch on:** a spacer that has laid-out cells on both sides is sized from
+  those two frames (`below.offset - (above.offset + above.length)`), not from
+  the average. The prop exists only so that stock and fixed can be compared in
+  the same app. The fix proposed in `ISSUE.md` is unconditional.
 
-# OR using Yarn
-yarn ios
-```
+`App.tsx` is the whole repro. FlatList's TypeScript types don't know the prop,
+hence the one `@ts-expect-error`.
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+## Evidence
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+Recorded on the iOS simulator with this app. Logs are from the JS console.
 
-## Step 3: Modifying your App
+| File | What |
+| --- | --- |
+| [`evidence/ios-stock.mp4`](evidence/ios-stock.mp4) | Stock: one tap on Run, then hands off |
+| [`evidence/ios-fixed.mp4`](evidence/ios-fixed.mp4) | Fix on, same steps |
+| [`evidence/ios-stock-drag.mp4`](evidence/ios-stock-drag.mp4) | Stock: a slow drag held while it rings, so the scroll indicator jitters |
+| [`evidence/ios-stock.log`](evidence/ios-stock.log), [`ios-fixed.log`](evidence/ios-fixed.log) | Logs of the two runs in the videos |
+| [`evidence/ios-scroll-up.log`](evidence/ios-scroll-up.log) | Scrolling up through the prepended rows: 423 corrections and 285 ring steps stock, against 6 and 0 fixed |
+| [`evidence/ios-spacer-diagnostics.log`](evidence/ios-spacer-diagnostics.log) | Temporary instrumentation of the spacer sizing, showing the two states the stock list alternates between |
+| [`evidence/android.log`](evidence/android.log) | The same on the Android emulator |
 
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+Across repeated runs on iOS, stock rang until reset 6 times out of 6. With the
+fix, the list settled after 2-4 corrections 5 times out of 5.

@@ -1,3 +1,4 @@
+# Captured with an earlier version of App.tsx (smaller readout, so a taller list).
 # iOS simulator, scrolling up through the prepended rows: scroll to y=3000, prepend 50 rows
 # (an earlier version of "Run", before it scrolled up by itself), then eight half-screen
 # drags up, 1 s apart, then rest. Only the prepend and the mVCP corrections are shown.

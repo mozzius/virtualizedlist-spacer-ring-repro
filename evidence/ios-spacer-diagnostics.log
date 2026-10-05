@@ -1,3 +1,4 @@
+# Captured with an earlier version of App.tsx (smaller readout, so a taller list).
 # Temporary instrumentation (not in the repo): a console.log after `spacerSize` is computed
 # in VirtualizedList's render, for the interior spacer only. `first`/`last` are the
 # getCellMetricsApprox() results the stock code uses; `above`/`below` are the frames of the

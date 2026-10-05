@@ -1,31 +1,25 @@
-# iOS simulator (iPhone 17 Pro, iOS 26.5), FIXED (measureInteriorSpacers). Same run as
-# ios-fixed.mp4, same steps as ios-stock.log. This is the complete log: nothing is logged after
-# +3860ms because nothing moves.
+# iOS simulator (iPhone 17 Pro, iOS 26.5), FIXED (measureInteriorSpacers), current App.tsx.
+# Same steps as ios-stock.log. This is the complete log: Run nudged up all 12 times without the
+# list moving by itself, and nothing is logged after +9383ms because nothing moves.
 
 [ring] reset, FIXED
-[ring] +1011ms y=3000.0 (dy=+3000.0) h=8330.0 (dh=+0.0)
-[ring] +2008ms prepending 50 rows (-50..-1) at y=3000.0 h=8330.0
-[ring] +2056ms y=20252.0 (dy=+17252.0) h=28216.0 (dh=+19886.0)
-[ring] +2126ms y=20310.3 (dy=+58.3) h=28274.3 (dh=+58.3) correction #1
-[ring] +2187ms y=20624.7 (dy=+314.3) h=28588.7 (dh=+314.3) correction #2
-[ring] +3558ms scrolling up 450pt
-[ring] +3575ms y=20621.7 (dy=-3.0) h=28588.7 (dh=+0.0)
-[ring] +3593ms y=20612.3 (dy=-9.3) h=28588.7 (dh=+0.0)
-[ring] +3609ms y=20596.0 (dy=-16.3) h=28588.7 (dh=+0.0)
-[ring] +3630ms y=20574.0 (dy=-22.0) h=28588.7 (dh=+0.0)
-[ring] +3643ms y=20546.7 (dy=-27.3) h=28588.7 (dh=+0.0)
-[ring] +3659ms y=20515.0 (dy=-31.7) h=28588.7 (dh=+0.0)
-[ring] +3675ms y=20479.7 (dy=-35.3) h=28588.7 (dh=+0.0)
-[ring] +3692ms y=20442.0 (dy=-37.7) h=28588.7 (dh=+0.0)
-[ring] +3719ms y=20403.0 (dy=-39.0) h=28588.7 (dh=+0.0)
-[ring] +3725ms y=20363.7 (dy=-39.3) h=28588.7 (dh=+0.0)
-[ring] +3746ms y=20325.7 (dy=-38.0) h=28588.7 (dh=+0.0)
-[ring] +3759ms y=20290.0 (dy=-35.7) h=28588.7 (dh=+0.0)
-[ring] +3785ms y=20257.7 (dy=-32.3) h=28588.7 (dh=+0.0)
-[ring] +3787ms y=19831.3 (dy=-426.3) h=28162.3 (dh=-426.3) correction #3
-[ring] +3792ms y=19803.0 (dy=-28.3) h=28162.3 (dh=+0.0)
-[ring] +3808ms y=19780.0 (dy=-23.0) h=28162.3 (dh=+0.0)
-[ring] +3825ms y=19763.0 (dy=-17.0) h=28162.3 (dh=+0.0)
-[ring] +3853ms y=19752.3 (dy=-10.7) h=28162.3 (dh=+0.0)
-[ring] +3856ms y=20195.0 (dy=+442.7) h=28605.0 (dh=+442.7) correction #4 RING #1 (69ms after -426.3)
-[ring] +3860ms y=20191.0 (dy=-4.0) h=28605.0 (dh=+0.0)
+[ring] +1018ms y=3000.0 (dy=+3000.0) h=7245.0 (dh=+0.0)
+[ring] +2016ms prepending 50 rows (-50..-1) at y=3000.0 h=7245.0
+[ring] +2078ms y=20041.7 (dy=+17041.7) h=27082.7 (dh=+19837.7)
+[ring] +2152ms y=20176.7 (dy=+135.0) h=27217.7 (dh=+135.0) correction #1
+[ring] +3585ms y=20126.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +4102ms y=20076.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +4616ms y=20026.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +5117ms y=19976.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +5636ms y=19926.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +6150ms y=19876.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +6652ms y=19826.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +7168ms y=19776.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +7686ms y=19726.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +8202ms y=19676.7 (dy=-50.0) h=27217.7 (dh=+0.0)
+[ring] +8296ms y=20088.0 (dy=+411.3) h=27629.0 (dh=+411.3) correction #2
+[ring] +8721ms y=20038.0 (dy=-50.0) h=27629.0 (dh=+0.0)
+[ring] +9236ms y=19988.0 (dy=-50.0) h=27629.0 (dh=+0.0)
+[ring] +9317ms y=19581.3 (dy=-406.7) h=27222.3 (dh=-406.7) correction #3
+[ring] +9383ms y=19987.3 (dy=+406.0) h=27628.3 (dh=+406.0) correction #4 RING #1 (66ms after -406.7)
+[ring] +9749ms still after 12 nudges, stopped scrolling

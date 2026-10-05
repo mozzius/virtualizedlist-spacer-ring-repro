@@ -1,8 +1,10 @@
+# Captured with an earlier version of App.tsx (smaller readout, so a taller list).
 # Android emulator (Pixel 9 Pro AVD, Android 15 / API 35). Steps: scroll to y=3000, prepend 50
 # rows, then one manual half-screen drag up (an earlier version of "Run", before it scrolled up
 # by itself). On Android the STOCK list started ringing right after the prepend, before the drag.
-# Logging stopped ~7.7 s into the STOCK run while the list was still ringing (the app
-# then showed an ANR dialog, not investigated).
+# Logging stopped ~7.7 s into the STOCK run while the list was still ringing, and the app then
+# showed an ANR dialog. That only happened with the JS debugger attached and receiving these
+# logs; without the debugger the same runs rang for 30+ s without stalling (see android-demo.mp4).
 
 ## STOCK
 

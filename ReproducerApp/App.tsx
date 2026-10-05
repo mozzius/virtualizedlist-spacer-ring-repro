@@ -25,6 +25,8 @@ const INITIAL_ROWS = 200;
 const PREPEND_ROWS = 50;
 /** How far down to scroll before prepending, in points. */
 const SCROLL_BEFORE_PREPEND = 3000;
+/** How far back up to scroll after prepending, in points. */
+const SCROLL_AFTER_PREPEND = 450;
 
 type Row = { id: number; height: number };
 
@@ -68,7 +70,11 @@ const stats = {
   maxSwing: 0,
 };
 
+/** Called by the first scroll event after a prepend has landed. */
+let onPrependLanded: null | (() => void) = null;
+
 function resetStats() {
+  onPrependLanded = null;
   stats.t0 = Date.now();
   stats.y = 0;
   stats.h = 0;
@@ -92,6 +98,12 @@ function onScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
   const dh = stats.h === 0 ? 0 : h - stats.h;
   stats.y = y;
   stats.h = h;
+
+  if (onPrependLanded && dh > 5000) {
+    const callback = onPrependLanded;
+    onPrependLanded = null;
+    callback();
+  }
 
   if (Math.abs(dy) >= 1) {
     const sign = Math.sign(dy);
@@ -232,7 +244,10 @@ function App() {
     });
   };
 
-  /** Reset, scroll a few screens down, then prepend. */
+  /**
+   * Reset, scroll a few screens down, prepend, then once the prepend has
+   * landed scroll up a little, into the prepended rows.
+   */
   const run = () => {
     reset();
     timers.current.push(
@@ -242,7 +257,23 @@ function App() {
           animated: false,
         });
       }, 1000),
-      setTimeout(prepend, 2000),
+      setTimeout(() => {
+        onPrependLanded = () => {
+          timers.current.push(
+            setTimeout(() => {
+              console.log(
+                `[ring] +${Date.now() - stats.t0}ms scrolling up ` +
+                  `${SCROLL_AFTER_PREPEND}pt`,
+              );
+              listRef.current?.scrollToOffset({
+                offset: stats.y - SCROLL_AFTER_PREPEND,
+                animated: true,
+              });
+            }, 1500),
+          );
+        };
+        prepend();
+      }, 2000),
     );
   };
 

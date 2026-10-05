@@ -22,7 +22,7 @@ the other. Its size changes whenever a cell mounts or unmounts at the window's
 leading edge, and mVCP has to chase it. [`ISSUE.md`](ISSUE.md) has the full
 analysis and a proposed fix.
 
-- **Upstream issue:** not filed yet
+- **Upstream issue:** [react/react-native#58870](https://github.com/react/react-native/issues/58870)
 - **Found in:** the Bluesky app
   ([bluesky-social/social-app#11872](https://github.com/bluesky-social/social-app/pull/11872)
   carries the fix as a patch)
